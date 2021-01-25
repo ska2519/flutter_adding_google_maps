@@ -13,6 +13,16 @@ class _MyAppState extends State<MyApp> {
 
   final LatLng _center = const LatLng(45.521563, -122.677433);
 
+  BitmapDescriptor _markerIcon;
+  Future<Set<Marker>> _createMarker(double latitude, double longitude) async {
+    return <Marker>[
+      Marker(
+          markerId: MarkerId('test_Id'),
+          position: (LatLng(latitude, longitude)),
+          icon: _markerIcon)
+    ].toSet();
+  }
+
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
@@ -25,13 +35,18 @@ class _MyAppState extends State<MyApp> {
           title: Text('Maps Sample App'),
           backgroundColor: Colors.green[700],
         ),
-        body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 11.0,
-          ),
-        ),
+        body: FutureBuilder<Set<Marker>>(
+            future: _createMarker(45.521563, -122.677433),
+            builder: (context, snapshot) {
+              return GoogleMap(
+                onMapCreated: _onMapCreated,
+                markers: snapshot.data,
+                initialCameraPosition: CameraPosition(
+                  target: _center,
+                  zoom: 11.0,
+                ),
+              );
+            }),
       ),
     );
   }
